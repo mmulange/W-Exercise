@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_margin="2dp"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -29,7 +32,6 @@
             android:layout_marginTop="5dp"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
-            android:src="@mipmap/ic_launcher"
             app:riv_corner_radius="12dp"
             app:riv_oval="false"
             app:riv_tile_mode="clamp" />
@@ -48,9 +50,4 @@
             android:textSize="16sp" />
 
     </RelativeLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/light_gray"></View>
-</LinearLayout>
+</android.support.v7.widget.CardView>

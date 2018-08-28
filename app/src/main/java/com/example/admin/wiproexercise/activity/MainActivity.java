@@ -1,5 +1,6 @@
 package com.example.admin.wiproexercise.activity;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -7,28 +8,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.example.admin.wiproexercise.R;
 import com.example.admin.wiproexercise.adapter.FeedsAdapter;
-import com.example.admin.wiproexercise.contractor.GetFeedData;
 import com.example.admin.wiproexercise.contractor.MainContract;
-import com.example.admin.wiproexercise.model.Feeds;
 import com.example.admin.wiproexercise.model.Row;
 import com.example.admin.wiproexercise.presenter.FeedPresenter;
 import com.example.admin.wiproexercise.utils.UtilDialog;
-import com.example.admin.wiproexercise.utils.Utils;
-import com.example.admin.wiproexercise.volley.APIConstant;
-import com.example.admin.wiproexercise.volley.VolleyHandler;
-import com.example.admin.wiproexercise.volley.VolleyResponseListener;
-import com.google.gson.Gson;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindString;
@@ -47,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @BindView(R.id.activity_main_rv)
     protected RecyclerView rvFeeds;
+
+    @BindView(R.id.activity_main_swiperefresh)
+    protected SwipeRefreshLayout swipeRefreshLayout;
 
     @BindView(R.id.activity_main_tv_title)
     protected TextView tvTitle;
@@ -77,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         initParameters();
         initViews();
 
-        presenter = new FeedPresenter(this, this, new GetFeedData());
-        presenter.requestDataFromServer(APIConstant.FEEDS_API);
+        presenter = new FeedPresenter(this);
+        presenter.requestDataFromServer();
     }
 
     public void initParameters() {
@@ -92,11 +84,20 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         rvFeeds.setLayoutManager(mLayoutManager);
         rvFeeds.setItemAnimator(new DefaultItemAnimator());
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                presenter.requestDataFromServer();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
     }
 
     @OnClick(R.id.activity_main_iv_refresh)
     public void refreshData() {
-        presenter.requestDataFromServer(APIConstant.FEEDS_API);
+        presenter.requestDataFromServer();
     }
 
     @Override
@@ -116,21 +117,21 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         tvTitle.setText(title);
 
         if (feedList.size() > 0) {
-            rvFeeds.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setVisibility(View.VISIBLE);
             tvError.setVisibility(View.GONE);
 
             feedsAdapter = new FeedsAdapter(feedList);
             rvFeeds.setAdapter(feedsAdapter);
         } else {
-            rvFeeds.setVisibility(View.GONE);
+            swipeRefreshLayout.setVisibility(View.GONE);
             tvError.setVisibility(View.VISIBLE);
             tvError.setText(noFeedsAvailable);
         }
     }
 
     @Override
-    public void onFailure(String message, String url) {
-        rvFeeds.setVisibility(View.GONE);
+    public void onFailure(String message) {
+        swipeRefreshLayout.setVisibility(View.GONE);
         tvError.setVisibility(View.VISIBLE);
         tvError.setText(message);
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();

@@ -2,7 +2,9 @@ package com.example.admin.wiproexercise.contractor;
 
 import android.content.Context;
 
+import com.example.admin.wiproexercise.database.AppDatabase;
 import com.example.admin.wiproexercise.model.Row;
+import com.example.admin.wiproexercise.utils.LocalData;
 
 import java.util.List;
 
@@ -21,7 +23,7 @@ public class MainContract {
 
         void setDataToView(List<Row> feedList, String title);
 
-        void onFailure(String message, String url);
+        void onFailure(String message);
     }
 
     /**
@@ -32,20 +34,6 @@ public class MainContract {
 
         void onDestroy();
 
-        void requestDataFromServer(String url);
-    }
-
-    /**
-     * GetFeedData built for fetching data from web services or any other data source.
-     **/
-    public interface GetFeedDataIntractor {
-
-        interface OnFinishedListener {
-            void onSuccess(List<Row> feedList, String title);
-
-            void onFailure(String message, String url);
-        }
-
-        void getFeedList(Context context, String url, OnFinishedListener onFinishedListener);
+        void requestDataFromServer();
     }
 }

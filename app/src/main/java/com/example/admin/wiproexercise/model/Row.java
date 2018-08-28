@@ -1,10 +1,16 @@
 package com.example.admin.wiproexercise.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "feeds")
 public class Row {
 
+    @PrimaryKey(autoGenerate = true)
+    private int id;
     @SerializedName("title")
     @Expose
     private String title;
@@ -14,6 +20,14 @@ public class Row {
     @SerializedName("imageHref")
     @Expose
     private String imageHref;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;

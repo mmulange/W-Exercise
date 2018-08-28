@@ -66,27 +66,23 @@ public class FeedsAdapter extends RecyclerView.Adapter<FeedsAdapter.MyViewHolder
 
         Uri newURI;
 
+        //Check empty images
         if (!TextUtils.isEmpty(feed.getImageHref())) {
             newURI = Uri.parse(feed.getImageHref());
-        } else {
-            newURI = getUriByResId(R.mipmap.ic_wipro_logo);
-        }
-        Glide.with(context)
-                .load(newURI)
-                .thumbnail(0.5f)
-                .placeholder(R.mipmap.ic_wipro_logo)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.ivPicture);
 
+            Glide.with(context)
+                    .load(newURI)
+                    .thumbnail(0.5f)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.ivPicture);
+        } else {
+            holder.ivPicture.setImageDrawable(null);
+        }
 
     }
 
     @Override
     public int getItemCount() {
         return feedsList.size();
-    }
-
-    private Uri getUriByResId(int resId) {
-        return new Uri.Builder().scheme("res").path(String.valueOf(resId)).build();
     }
 }
