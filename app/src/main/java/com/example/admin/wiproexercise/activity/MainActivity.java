@@ -16,8 +16,10 @@ import com.example.admin.wiproexercise.adapter.FeedsAdapter;
 import com.example.admin.wiproexercise.contractor.MainContract;
 import com.example.admin.wiproexercise.model.Row;
 import com.example.admin.wiproexercise.presenter.FeedPresenter;
+import com.example.admin.wiproexercise.retrofit.APIConstant;
 import com.example.admin.wiproexercise.utils.UtilDialog;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.BindString;
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     private UtilDialog utilDialog;
     private FeedsAdapter feedsAdapter;
     private MainContract.Presenter presenter;
+    private File httpCacheDirectory;
 
 
     @Override
@@ -70,10 +73,11 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         initViews();
 
         presenter = new FeedPresenter(this);
-        presenter.requestDataFromServer();
+        presenter.requestDataFromServer(httpCacheDirectory);
     }
 
     public void initParameters() {
+        httpCacheDirectory = new File(this.getCacheDir(), APIConstant.HTTP_CACHE);
         utilDialog = UtilDialog.getInstance(this);
     }
 
@@ -88,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                presenter.requestDataFromServer();
+                presenter.requestDataFromServer(httpCacheDirectory);
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -97,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @OnClick(R.id.activity_main_iv_refresh)
     public void refreshData() {
-        presenter.requestDataFromServer();
+        presenter.requestDataFromServer(httpCacheDirectory);
     }
 
     @Override

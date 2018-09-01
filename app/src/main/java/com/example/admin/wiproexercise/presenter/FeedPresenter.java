@@ -1,22 +1,15 @@
 package com.example.admin.wiproexercise.presenter;
 
 
-import android.content.Context;
-import android.support.design.widget.TabLayout;
 import android.util.Log;
 
-import com.example.admin.wiproexercise.R;
-import com.example.admin.wiproexercise.activity.MainActivity;
 import com.example.admin.wiproexercise.contractor.MainContract;
-import com.example.admin.wiproexercise.database.AppDatabase;
 import com.example.admin.wiproexercise.model.Feeds;
 import com.example.admin.wiproexercise.model.Row;
 import com.example.admin.wiproexercise.retrofit.APIClient;
 import com.example.admin.wiproexercise.retrofit.APIInterface;
-import com.example.admin.wiproexercise.utils.LocalData;
-import com.example.admin.wiproexercise.utils.MyApplication;
-import com.example.admin.wiproexercise.utils.Utils;
 
+import java.io.File;
 import java.util.List;
 
 import retrofit2.Call;
@@ -44,64 +37,54 @@ public class FeedPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void requestDataFromServer() {
+    public void requestDataFromServer(File httpCacheDirectory) {
         if (view != null) {
             view.showProgress();
         }
 
-        getFeedList();
+        getFeedList(httpCacheDirectory);
     }
 
-    public void getFeedList() {
-
-        if (Utils.getDataConnection(MyApplication.getContext())) {
-
-            /** Create handle for the RetrofitInstance interface*/
-            APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
-
-            /** Call the method with parameter in the interface to get the feeds data*/
-            Call<Feeds> call = apiInterface.getFeeds();
-
-            /**Log the URL called*/
-            Log.d(TAG, "URL Called " + call.request().url() + "");
-
-            call.enqueue(new Callback<Feeds>() {
-                @Override
-                public void onResponse(Call<Feeds> call, retrofit2.Response<Feeds> response) {
-                    AppDatabase.getInstance(MyApplication.getContext()).feedsDao().delete();
-                    AppDatabase.getInstance(MyApplication.getContext()).feedsDao().insertAll(response.body().getRows());
-                    LocalData.getInstance(MyApplication.getContext()).setTitle(response.body().getTitle());
-
-                    if (view != null) {
-                        view.setDataToView(response.body().getRows(), response.body().getTitle());
-                        view.hideProgress();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Feeds> call, Throwable t) {
-                    if (view != null) {
-                        view.onFailure(t.getMessage());
-                        view.hideProgress();
-                    }
-                }
-            });
-
-        } else {
-            Log.d(TAG, "Offline data");
-
-            List<Row> feeds = AppDatabase.getInstance(MyApplication.getContext()).feedsDao().getAll();
-            String title = LocalData.getInstance(MyApplication.getContext()).getTitle();
-
-            if (view != null) {
-
-                if (feeds.size() > 0)
-                    view.setDataToView(feeds, title);
-                else
-                    view.onFailure(MyApplication.getContext().getResources().getString(R.string.no_internet));
-
-                view.hideProgress();
-            }
+    @Override
+    public void setFeedList(List<Row> feeds, String title) {
+        if (view != null) {
+            view.setDataToView(feeds, title);
+            view.hideProgress();
         }
+    }
+
+    @Override
+    public void setError(String message) {
+        if (view != null) {
+            view.onFailure(message);
+            view.hideProgress();
+        }
+    }
+
+    public void getFeedList(File httpCacheDirectory) {
+
+        /** Create handle for the RetrofitInstance interface*/
+        APIInterface apiInterface = APIClient.getClient(httpCacheDirectory).create(APIInterface.class);
+
+        /** Call the method with parameter in the interface to get the feeds data*/
+        Call<Feeds> call = apiInterface.getFeeds();
+
+        /**Log the URL called*/
+        //Log.d(TAG, "URL Called " + call.request().url() + "");
+
+        call.enqueue(new Callback<Feeds>() {
+            @Override
+            public void onResponse(Call<Feeds> call, retrofit2.Response<Feeds> response) {
+                if (response.isSuccessful())
+                    setFeedList(response.body().getRows(), response.body().getTitle());
+                else
+                    setError(response.message());
+            }
+
+            @Override
+            public void onFailure(Call<Feeds> call, Throwable t) {
+                setError(t.getMessage());
+            }
+        });
     }
 }

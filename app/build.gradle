@@ -16,6 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 dependencies {
@@ -35,9 +39,6 @@ dependencies {
 
     implementation 'com.android.support:design:28.+'
 
-    // volley
-    implementation 'com.android.volley:volley:1.0.0'
-
     // gson
     implementation 'com.google.code.gson:gson:2.6.2'
 
@@ -54,8 +55,4 @@ dependencies {
     // Retrofit for consuming webservices
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-
-    // Room database for local storage, when mobile data is turned off.
-    implementation 'android.arch.persistence.room:runtime:1.0.0'
-    annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
 }

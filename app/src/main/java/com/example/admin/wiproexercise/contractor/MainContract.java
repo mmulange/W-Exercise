@@ -1,11 +1,9 @@
 package com.example.admin.wiproexercise.contractor;
 
-import android.content.Context;
 
-import com.example.admin.wiproexercise.database.AppDatabase;
 import com.example.admin.wiproexercise.model.Row;
-import com.example.admin.wiproexercise.utils.LocalData;
 
+import java.io.File;
 import java.util.List;
 
 public class MainContract {
@@ -34,6 +32,10 @@ public class MainContract {
 
         void onDestroy();
 
-        void requestDataFromServer();
+        void requestDataFromServer(File httpCacheDirectory);
+
+        void setFeedList(List<Row> feeds, String title);
+
+        void setError(String message);
     }
 }
