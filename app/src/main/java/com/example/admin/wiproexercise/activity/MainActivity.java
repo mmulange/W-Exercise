@@ -18,6 +18,7 @@ import com.example.admin.wiproexercise.model.Row;
 import com.example.admin.wiproexercise.presenter.FeedPresenter;
 import com.example.admin.wiproexercise.retrofit.APIConstant;
 import com.example.admin.wiproexercise.utils.UtilDialog;
+import com.example.admin.wiproexercise.utils.Utils;
 
 import java.io.File;
 import java.util.List;
@@ -72,8 +73,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         initParameters();
         initViews();
 
+        if (!Utils.isNetworkConnected(this))
+            Toast.makeText(this, this.getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
+
         presenter = new FeedPresenter(this);
         presenter.requestDataFromServer(httpCacheDirectory);
+
     }
 
     public void initParameters() {
@@ -92,6 +97,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+
+                if (!Utils.isNetworkConnected(MainActivity.this))
+                    Toast.makeText(MainActivity.this, MainActivity.this.getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
+
                 presenter.requestDataFromServer(httpCacheDirectory);
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -101,6 +110,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @OnClick(R.id.activity_main_iv_refresh)
     public void refreshData() {
+
+        if (!Utils.isNetworkConnected(this))
+            Toast.makeText(this, this.getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
+
         presenter.requestDataFromServer(httpCacheDirectory);
     }
 
@@ -138,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         swipeRefreshLayout.setVisibility(View.GONE);
         tvError.setVisibility(View.VISIBLE);
         tvError.setText(message);
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
